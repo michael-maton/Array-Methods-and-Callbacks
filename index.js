@@ -29,7 +29,7 @@ function getFinals(data) {
         return (game.Stage === 'Final');
     });
     return finalsGames;
-};
+}
 
 console.log(getFinals(fifaData));
 
@@ -40,7 +40,7 @@ function getYears(callback) {
         return game.Year;
     });
     return years;
-};
+}
 
 console.log(getYears(getFinals(fifaData)));
 
@@ -48,21 +48,36 @@ console.log(getYears(getFinals(fifaData)));
 
 function getWinners(callback) {
     let winners = [];
-    for (let i in callback){
-        if(callback[i]["Home Team Goals"] > callback[i]["Away Team Goals"]){
-            // console.log(`Winner = ${callback[i]["Home Team Name"]}`);
-            winners.push(callback[i]["Home Team Name"]);
+    // for (let i in callback){
+    //     if(callback[i]["Home Team Goals"] > callback[i]["Away Team Goals"]){
+    //         winners.push(callback[i]["Home Team Name"]);
+    //     }
+    //     else if(callback[i]["Home Team Goals"] < callback[i]["Away Team Goals"]){
+    //         winners.push(callback[i]["Away Team Name"]);
+    //     }
+    //     else {
+    //         winners.push("Tied in Regulation");
+    //     }
+    // }
+
+    callback.forEach(data => {
+        if(data["Home Team Goals"] > data["Away Team Goals"]){
+            winners.push(data["Home Team Name"]);
         }
-        else if(callback[i]["Home Team Goals"] < callback[i]["Away Team Goals"]){
-            // console.log(`Winner = ${callback[i]["Away Team Name"]}`);
-            winners.push(callback[i]["Away Team Name"]);
+        else if(data["Home Team Goals"] < data["Away Team Goals"]){
+            winners.push(data["Away Team Name"]);
         }
         else {
-            // console.log(`It is a tie...for now`);
             winners.push("Tied in Regulation");
         }
-    }
+    });
+
+
+
     return winners;
+
+
+
 };
 
 console.log(getWinners(getFinals(fifaData)));
@@ -105,18 +120,63 @@ getAverageGoals(fifaData);
 Hint: Investigate your data to find "team initials"!
 Hint: use `.reduce` */
 
-function getCountryWins(/* code here */) {
+let homeInitials = fifaData.map(function(item){
+    return item["Home Team Initials"];
+});
+let awayInitials = fifaData.map((item) => {return item["Away Team Initials"]});
+console.log(homeInitials);
+console.log(awayInitials);
 
-    /* code here */
+function getCountryWins(data, initials) {
+    let arrInit = [];
+    for (let i in data){
+        if (data[i]["Home Team Initials"] === initials || data[i]["Away Team Initials"] === initials){
+            arrInit.push(data[i]);
+        }
+    }
+    console.log(arrInit);
+    // for (let k in arrInit){
+    //     var newARR = arrInit[k]["Win conditions"].toUpperCase();
+    // }
+    // console.log(newARR);
+    const wins = arrInit.reduce(function (count, item){
+        if (item["Home Team Initials"] === initials && item["Home Team Goals"] > item["Away Team Goals"]){
+        count++;
+        }
+        else if (item["Away Team Initials"] === initials && item["Away Team Goals"] > item["Home Team Goals"]){
+        count++;
+        }
+        else if (item["Win conditions"].slice(0,3).toUpperCase() === initials) {
+           count++;
+        }
+        return count;
+    }, 0);
+    return wins;
 
-};
 
-getCountryWins();
+    // let wins = 0;
+    // for(let j in data){
+    //     if (data[j]["Home Team Initials"] === initials && data[j]["Home Team Goals"] > data[j]["Away Team Goals"]){
+    //     wins++;
+    //     }
+    //     else if (data[j]["Away Team Initials"] === initials && data[j]["Away Team Goals"] > data[j]["Home Team       Goals"]){
+    //     wins++;
+    //     }
+        // else if (data[j]["Home Team Initials"] === data[j]["Away Team Initials"]){
 
+        // }
+    // }
+    
+//     console.log(arrInit);
+//     return wins;
+}
 
+console.log(getCountryWins(fifaData, "GER"));
+
+console.log(fifaData[576]["Win conditions"].toUpperCase());
 /* Stretch 3: Write a function called getGoals() that accepts a parameter `data` and returns the team with the most goals score per appearance (average goals for) in the World Cup finals */
 
-function getGoals(/* code here */) {
+function getGoals(data) {
 
     /* code here */
 
